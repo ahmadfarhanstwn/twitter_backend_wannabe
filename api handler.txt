@@ -1,0 +1,50 @@
+//////////////DATABASE FUNCTION///////////////////
+
+//users
+signup (post/create users) = createUser, return value
+login (post) = input, getUser, hash password, check if user exist, token 
+
+--authorized--
+//users
+getUser (get/get users) = username from auth header, getUser 
+updateUser (put/update users) = input, updateUser
+addFollower
+addFollowing
+getFollowers
+getFollowing
+//////TODO : UPDATE username(pk) and affect that to foreign keys
+
+//relationships
+follow (post?)
+unfollow (delete?)
+GetRelations
+
+//tweets
+createTweets (post)
+getTweets (get)
+
+
+//////////////////////API FUNCTION////////////////
+SignUp = Input, CreateUsers, return
+Login = Input, GetUser, Check if user exists, compare password, create token, return user with token
+
+GetProfile = GetUser by auth header, return
+UpdateProfile = input updated value, GetUser by auth header, updateUser, return
+GetFollowers = GetUser by auth header, init return value, getUser, loop the followers, return
+GetFollowing = GetUser by auth header, init return value, getUser, loop the followings, return
+
+Follow = input, check if account that want to follow exists, GetRelations (if exist, already follow, else ok), 
+         createRelations, AddFollowing to follower_username, AddFollower to followed_username,
+         increment following_count of follower_username, increment follower_count of followed_username,
+         return
+Unfollow = input, check if account that want to follow exists, GetRelations (if exist, oke, else not following), 
+           DeleteRelations , DeleteFollowing from follower_username, DeleteFollower from followed_username,
+           decrement following_count of follower_username, 
+           decrement follower_count of followed_username,
+           return
+
+PostTweet = input, CreateTweet
+//TODO :
+GetTweet 
+DeleteTweet = input id tweets, deleteTweet
+GetTweets(Home Feature/MOST COMPLICATED)
