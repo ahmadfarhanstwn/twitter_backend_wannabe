@@ -16,4 +16,7 @@ migratedown:
 sqlc:
 	docker run --rm -v "D:\Study\learn_go\twitter_wannabe:/src" -w /src kjconroy/sqlc generate
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc
+test:
+	go test -v ./...
+
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test
