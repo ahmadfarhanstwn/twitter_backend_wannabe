@@ -8,12 +8,22 @@ RETURNING *;
 SELECT * FROM users
 WHERE username = $1 LIMIT 1;
 
--- name: UpdateUser :one
+-- name: UpdateEmail :one
 UPDATE users SET 
-email = $1,
-hashed_password= $2,
-name = $3
-WHERE username = $4
+email = $1
+WHERE username = $2
+RETURNING *;
+
+-- name: UpdatePassword :one
+UPDATE users SET
+hashed_password = $1
+WHERE username = $2
+RETURNING *;
+
+-- name: UpdateName :one
+UPDATE users SET
+name = $1
+WHERE username = $2
 RETURNING *;
 
 -- name: IncrementFollowing :one

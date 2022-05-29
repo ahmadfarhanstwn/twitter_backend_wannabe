@@ -101,3 +101,23 @@ func TestGetTweet(t *testing.T) {
 	require.Equal(t, createdTweet.Username, getTweet.Username)
 	require.WithinDuration(t, createdTweet.CreatedAt, getTweet.CreatedAt, time.Second)
 }
+
+func TestIncrementLike(t *testing.T) {
+	createdTweet := CreateTweet(t)
+
+	likedTweet, err := testQueries.IncrementLike(context.Background(), createdTweet.ID)
+	require.NoError(t, err)
+	require.NotEmpty(t, likedTweet)
+
+	require.Equal(t, createdTweet.Likes.Int32+1, likedTweet.Likes.Int32)
+}
+
+func TestDecrementLike(t *testing.T) {
+	createdTweet := CreateTweet(t)
+
+	likedTweet, err := testQueries.DecrementLike(context.Background(), createdTweet.ID)
+	require.NoError(t, err)
+	require.NotEmpty(t, likedTweet)
+
+	require.Equal(t, createdTweet.Likes.Int32-1, likedTweet.Likes.Int32)
+}

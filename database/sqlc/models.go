@@ -9,6 +9,13 @@ import (
 	"time"
 )
 
+type LikeRelations struct {
+	ID        int64     `json:"id"`
+	Username  string    `json:"username"`
+	TweetID   int64     `json:"tweet_id"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type Relations struct {
 	ID               int64     `json:"id"`
 	FollowerUsername string    `json:"follower_username"`
@@ -17,10 +24,11 @@ type Relations struct {
 }
 
 type Tweets struct {
-	ID        int64     `json:"id"`
-	Tweet     string    `json:"tweet"`
-	Username  string    `json:"username"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        int64         `json:"id"`
+	Tweet     string        `json:"tweet"`
+	Username  string        `json:"username"`
+	Likes     sql.NullInt32 `json:"likes"`
+	CreatedAt time.Time     `json:"created_at"`
 }
 
 type Users struct {

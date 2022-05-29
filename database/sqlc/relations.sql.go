@@ -67,7 +67,7 @@ func (q *Queries) GetFollower(ctx context.Context, arg GetFollowerParams) ([]Rel
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Relations
+	items := []Relations{}
 	for rows.Next() {
 		var i Relations
 		if err := rows.Scan(
@@ -108,7 +108,7 @@ func (q *Queries) GetFollowing(ctx context.Context, arg GetFollowingParams) ([]R
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Relations
+	items := []Relations{}
 	for rows.Next() {
 		var i Relations
 		if err := rows.Scan(

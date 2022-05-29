@@ -13,7 +13,7 @@ const createTweet = `-- name: CreateTweet :one
 INSERT INTO tweets
 (tweet, username)
 VALUES ($1,$2)
-RETURNING id, tweet, username, created_at
+RETURNING id, tweet, username, likes, created_at
 `
 
 type CreateTweetParams struct {
@@ -28,6 +28,27 @@ func (q *Queries) CreateTweet(ctx context.Context, arg CreateTweetParams) (Tweet
 		&i.ID,
 		&i.Tweet,
 		&i.Username,
+		&i.Likes,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const decrementLike = `-- name: DecrementLike :one
+UPDATE tweets SET
+likes = likes - 1
+WHERE id = $1
+RETURNING id, tweet, username, likes, created_at
+`
+
+func (q *Queries) DecrementLike(ctx context.Context, id int64) (Tweets, error) {
+	row := q.db.QueryRowContext(ctx, decrementLike, id)
+	var i Tweets
+	err := row.Scan(
+		&i.ID,
+		&i.Tweet,
+		&i.Username,
+		&i.Likes,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -44,7 +65,7 @@ func (q *Queries) DeleteTweet(ctx context.Context, id int64) error {
 }
 
 const getListTweets = `-- name: GetListTweets :many
-SELECT id, tweet, username, created_at FROM tweets
+SELECT id, tweet, username, likes, created_at FROM tweets
 WHERE username = $1
 ORDER BY id DESC
 LIMIT $2 OFFSET $3
@@ -62,13 +83,14 @@ func (q *Queries) GetListTweets(ctx context.Context, arg GetListTweetsParams) ([
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Tweets
+	items := []Tweets{}
 	for rows.Next() {
 		var i Tweets
 		if err := rows.Scan(
 			&i.ID,
 			&i.Tweet,
 			&i.Username,
+			&i.Likes,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -85,7 +107,7 @@ func (q *Queries) GetListTweets(ctx context.Context, arg GetListTweetsParams) ([
 }
 
 const getTweet = `-- name: GetTweet :one
-SELECT id, tweet, username, created_at FROM tweets
+SELECT id, tweet, username, likes, created_at FROM tweets
 WHERE id = $1 LIMIT 1
 `
 
@@ -96,6 +118,27 @@ func (q *Queries) GetTweet(ctx context.Context, id int64) (Tweets, error) {
 		&i.ID,
 		&i.Tweet,
 		&i.Username,
+		&i.Likes,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const incrementLike = `-- name: IncrementLike :one
+UPDATE tweets SET
+likes = likes + 1
+WHERE id = $1
+RETURNING id, tweet, username, likes, created_at
+`
+
+func (q *Queries) IncrementLike(ctx context.Context, id int64) (Tweets, error) {
+	row := q.db.QueryRowContext(ctx, incrementLike, id)
+	var i Tweets
+	err := row.Scan(
+		&i.ID,
+		&i.Tweet,
+		&i.Username,
+		&i.Likes,
 		&i.CreatedAt,
 	)
 	return i, err

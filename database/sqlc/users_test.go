@@ -58,26 +58,54 @@ func TestGetUserOK(t *testing.T) {
 	require.WithinDuration(t, createdUser.CreatedAt, fetchedUser.CreatedAt, time.Second)
 }
 
-func TestUpdateUserOK(t *testing.T) {
+func TestUpdateEmail(t *testing.T) {
 	user := CreateRandomUser(t)
 	newEmail := util.GetRandomEmail()
-	newPassword := util.GetRandomString(6)
-	newName := util.GetRandomString(8)
 
-	params := UpdateUserParams{
-		Email: newEmail,
-		HashedPassword: newPassword,
-		Name: newName,
+	params := UpdateEmailParams{
 		Username: user.Username,
+		Email: newEmail,
 	}
 
-	updatedUser, err := testQueries.UpdateUser(context.Background(), params)
+	updatedUser, err := testQueries.UpdateEmail(context.Background(), params)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, updatedUser)
 
 	require.Equal(t, newEmail, updatedUser.Email)
+}
+
+func TestUpdatePassword(t *testing.T) {
+	user := CreateRandomUser(t)
+	newPassword := util.GetRandomString(8)
+
+	params := UpdatePasswordParams{
+		Username: user.Username,
+		HashedPassword: newPassword,
+	}
+
+	updatedUser, err := testQueries.UpdatePassword(context.Background(), params)
+
+	require.NoError(t, err)
+	require.NotEmpty(t, updatedUser)
+
 	require.Equal(t, newPassword, updatedUser.HashedPassword)
+}
+
+func TestUpdateName(t *testing.T) {
+	user := CreateRandomUser(t)
+	newName := util.GetRandomString(8)
+
+	params := UpdateNameParams{
+		Username: user.Username,
+		Name: newName,
+	}
+
+	updatedUser, err := testQueries.UpdateName(context.Background(), params)
+
+	require.NoError(t, err)
+	require.NotEmpty(t, updatedUser)
+
 	require.Equal(t, newName, updatedUser.Name)
 }
 

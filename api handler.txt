@@ -44,7 +44,8 @@ Unfollow = input, check if account that want to follow exists, GetRelations (if 
            return
 
 PostTweet = input, CreateTweet
-//TODO :
-GetTweet 
 DeleteTweet = input id tweets, deleteTweet
+GetTweet 
+
+//TODO :
 GetTweets(Home Feature/MOST COMPLICATED)

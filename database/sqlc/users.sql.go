@@ -157,29 +157,76 @@ func (q *Queries) IncrementFollowing(ctx context.Context, username string) (User
 	return i, err
 }
 
-const updateUser = `-- name: UpdateUser :one
+const updateEmail = `-- name: UpdateEmail :one
 UPDATE users SET 
-email = $1,
-hashed_password= $2,
-name = $3
-WHERE username = $4
+email = $1
+WHERE username = $2
 RETURNING username, email, hashed_password, name, followers_count, following_count, changed_password_at, created_at
 `
 
-type UpdateUserParams struct {
-	Email          string `json:"email"`
+type UpdateEmailParams struct {
+	Email    string `json:"email"`
+	Username string `json:"username"`
+}
+
+func (q *Queries) UpdateEmail(ctx context.Context, arg UpdateEmailParams) (Users, error) {
+	row := q.db.QueryRowContext(ctx, updateEmail, arg.Email, arg.Username)
+	var i Users
+	err := row.Scan(
+		&i.Username,
+		&i.Email,
+		&i.HashedPassword,
+		&i.Name,
+		&i.FollowersCount,
+		&i.FollowingCount,
+		&i.ChangedPasswordAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updateName = `-- name: UpdateName :one
+UPDATE users SET
+name = $1
+WHERE username = $2
+RETURNING username, email, hashed_password, name, followers_count, following_count, changed_password_at, created_at
+`
+
+type UpdateNameParams struct {
+	Name     string `json:"name"`
+	Username string `json:"username"`
+}
+
+func (q *Queries) UpdateName(ctx context.Context, arg UpdateNameParams) (Users, error) {
+	row := q.db.QueryRowContext(ctx, updateName, arg.Name, arg.Username)
+	var i Users
+	err := row.Scan(
+		&i.Username,
+		&i.Email,
+		&i.HashedPassword,
+		&i.Name,
+		&i.FollowersCount,
+		&i.FollowingCount,
+		&i.ChangedPasswordAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updatePassword = `-- name: UpdatePassword :one
+UPDATE users SET
+hashed_password = $1
+WHERE username = $2
+RETURNING username, email, hashed_password, name, followers_count, following_count, changed_password_at, created_at
+`
+
+type UpdatePasswordParams struct {
 	HashedPassword string `json:"hashed_password"`
-	Name           string `json:"name"`
 	Username       string `json:"username"`
 }
 
-func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (Users, error) {
-	row := q.db.QueryRowContext(ctx, updateUser,
-		arg.Email,
-		arg.HashedPassword,
-		arg.Name,
-		arg.Username,
-	)
+func (q *Queries) UpdatePassword(ctx context.Context, arg UpdatePasswordParams) (Users, error) {
+	row := q.db.QueryRowContext(ctx, updatePassword, arg.HashedPassword, arg.Username)
 	var i Users
 	err := row.Scan(
 		&i.Username,

@@ -19,7 +19,7 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	testDB, err := sql.Open(config.DB_Driver, config.DB_Source)
+	testDB, err = sql.Open(config.DB_Driver, config.DB_Source)
 	if err != nil {
 		log.Fatal(err)
 	}
