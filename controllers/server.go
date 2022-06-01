@@ -35,8 +35,31 @@ func NewServer(config util.Config, dbtx database.Transaction) (*Server, error) {
 func (s *Server) SetupRouter(){
 	router := gin.Default()
 
-	// route
-	router.POST("/signup", s.SignUp)
+	// out of auth middleware
+	router.POST("/register", s.SignUp)
+	router.POST("/login", s.Login)
+
+	authRouter := router.Group("/").Use(AuthMiddleware(s.paseto))
+
+	//user
+	authRouter.GET("/profile", s.GetUserProfile)
+	authRouter.PUT("/password", s.UpdatePassword)
+	authRouter.PUT("/email", s.UpdateEmail)
+	authRouter.PUT("/name", s.UpdateName)
+	authRouter.GET("/followers", s.GetFollowersList)
+	authRouter.GET("/following", s.GetFollowingList)
+
+	//tweets
+	authRouter.POST("/tweet", s.CreateTweet)
+	authRouter.DELETE("/tweet", s.DeleteTweet)
+	authRouter.GET("/tweet", s.GetTweet)
+	authRouter.POST("/like", s.LikeTweet)
+	authRouter.DELETE("/unlike", s.UnlikeTweet)
+	authRouter.GET("/feeds", s.GetFeeds)
+
+	//relations
+	authRouter.POST("/follow", s.Follow)
+	authRouter.DELETE("/unfollow", s.Unfollow)
 
 	s.router = router
 }

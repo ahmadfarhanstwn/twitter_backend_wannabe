@@ -98,7 +98,7 @@ func (s *Server) Login(c *gin.Context) {
 		return
 	}
 
-	err = util.CheckHashPassword(user.HashedPassword, loginReq.Password)
+	err = util.CheckHashPassword(loginReq.Password, user.HashedPassword)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, ErrResponse(err.Error()))
 		return
@@ -311,7 +311,7 @@ func (s *Server) GetFollowingList(c *gin.Context) {
 	}
 
 	for _,f := range followings {
-		following, err := s.transaction.GetUser(c, f.FollowerUsername)
+		following, err := s.transaction.GetUser(c, f.FollowedUsername)
 		if err != nil {
 			c.JSON(http.StatusNotFound, ErrResponse(err.Error()))
 			return

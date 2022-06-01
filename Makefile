@@ -19,4 +19,13 @@ sqlc:
 test:
 	go test -v ./...
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test
+test_api:
+	go test -v github.com/ahmadfarhanstwn/twitter_wannabe/controllers
+
+run:
+	go run main.go
+
+mock:
+	mockgen -package dbmock -destination database/mock/db_mock.go github.com/ahmadfarhanstwn/twitter_wannabe/database/sqlc Transaction
+
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test run mock test_api

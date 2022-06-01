@@ -48,4 +48,4 @@ DeleteTweet = input id tweets, deleteTweet
 GetTweet 
 
 //TODO :
-GetTweets(Home Feature/MOST COMPLICATED)
+GetFeed(Home Feature/MOST COMPLICATED)
