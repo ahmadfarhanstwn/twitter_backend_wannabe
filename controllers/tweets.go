@@ -175,7 +175,7 @@ func (s *Server) GetFeeds(c *gin.Context) {
 	relations, err := s.transaction.GetFollowing(c, database.GetFollowingParams{
 		FollowerUsername: authHeader.Username,
 		Limit: 10000,
-		Offset: 0,
+		Offset: 1,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrResponse(err.Error()))
@@ -187,9 +187,9 @@ func (s *Server) GetFeeds(c *gin.Context) {
 		tweets, err := s.transaction.GetListTweets(c,database.GetListTweetsParams{
 			Username: relation.FollowedUsername,
 			Limit: 100,
-			Offset: 0,
+			Offset: 1,
 		})
-		if err != nil {
+		if err != nil {	
 			c.JSON(http.StatusInternalServerError, ErrResponse(err.Error()))
 			return
 		}

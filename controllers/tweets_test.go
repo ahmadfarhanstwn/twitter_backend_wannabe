@@ -600,3 +600,71 @@ func TestUnlikeTweet(t *testing.T) {
 		testcase.checkResponse(t,recorder)
 	}
 }
+
+func TestGetFeeds(t *testing.T) {
+	user, _ := randomUser(t)
+
+	testCases := []struct{
+		name string
+		setupAuth func(t *testing.T, request *http.Request, paseto token.Paseto)
+		buildStubs func(transaction *dbmock.MockTransaction)
+		checkResponse func(t *testing.T,recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name: "OK",
+			setupAuth: func(t *testing.T, request *http.Request, paseto token.Paseto) {
+				AddAuth(t, request, paseto, authorizationTypeBearer, user.Username, time.Minute)
+			},
+			buildStubs: func(transaction *dbmock.MockTransaction) {
+				getFollowingArg := database.GetFollowingParams{
+					FollowerUsername: user.Username,
+					Limit: 10000,
+					Offset: 1,
+				}
+				transaction.EXPECT().GetFollowing(gomock.Any(),gomock.Eq(getFollowingArg)).Times(1).Return([]database.Relations{}, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name: "Internal server error",
+			setupAuth: func(t *testing.T, request *http.Request, paseto token.Paseto) {
+				AddAuth(t, request, paseto, authorizationTypeBearer, user.Username, time.Minute)
+			},
+			buildStubs: func(transaction *dbmock.MockTransaction) {
+				getFollowingArg := database.GetFollowingParams{
+					FollowerUsername: user.Username,
+					Limit: 10000,
+					Offset: 1,
+				}
+				transaction.EXPECT().GetFollowing(gomock.Any(),gomock.Eq(getFollowingArg)).Times(1).Return([]database.Relations{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+	}
+
+	for _, testcase := range testCases{
+		//create controller
+		controller := gomock.NewController(t)
+		defer controller.Finish()
+
+		//create mock transaction
+		transaction := dbmock.NewMockTransaction(controller)
+		testcase.buildStubs(transaction)
+
+		// create test server
+		server := NewTestServer(t, transaction)
+		recorder := httptest.NewRecorder()
+
+		url := "/feeds"
+		req, err := http.NewRequest(http.MethodGet, url, nil)
+		require.NoError(t, err)
+
+		testcase.setupAuth(t, req, server.paseto)
+		server.router.ServeHTTP(recorder, req)
+		testcase.checkResponse(t,recorder)
+	}
+}

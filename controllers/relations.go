@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 
@@ -34,7 +35,7 @@ func (s *Server) Follow(c *gin.Context) {
 		FollowedUsername: req.FollowUser,
 	}
 	_,err = s.transaction.GetRelations(c, arg)
-	if err == nil {
+	if err != sql.ErrNoRows || err == nil {
 		c.JSON(http.StatusCreated,gin.H{
 			"error" : fmt.Sprintf("%v has already followed %v", authHeader.Username, req.FollowUser),
 		})
